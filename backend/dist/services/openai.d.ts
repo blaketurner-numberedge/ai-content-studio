@@ -14,7 +14,21 @@ export interface GeneratedImage {
     revised_prompt?: string;
     b64_json?: string;
 }
+export interface VariationOptions {
+    imagePath: string;
+    n?: number;
+    size?: string;
+}
+export interface EditOptions {
+    imagePath: string;
+    maskPath?: string;
+    prompt: string;
+    n?: number;
+    size?: string;
+}
 export declare function generateImage(options: GenerateImageOptions): Promise<GeneratedImage[]>;
+export declare function createVariations(options: VariationOptions): Promise<GeneratedImage[]>;
+export declare function createEdit(options: EditOptions): Promise<GeneratedImage[]>;
 export declare const MODEL_OPTIONS: Record<ImageModel, {
     sizes: string[];
     qualities: string[];

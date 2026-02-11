@@ -5,7 +5,10 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.MODEL_OPTIONS = exports.openai = void 0;
 exports.generateImage = generateImage;
+exports.createVariations = createVariations;
+exports.createEdit = createEdit;
 const openai_1 = __importDefault(require("openai"));
+const fs_1 = __importDefault(require("fs"));
 if (!process.env.OPENAI_API_KEY) {
     throw new Error('OPENAI_API_KEY environment variable is required');
 }
@@ -28,6 +31,33 @@ async function generateImage(options) {
     return (response.data || []).map(img => ({
         url: img.url || '',
         revised_prompt: img.revised_prompt,
+    }));
+}
+async function createVariations(options) {
+    const { imagePath, n = 1, size = '1024x1024' } = options;
+    const response = await exports.openai.images.createVariation({
+        image: fs_1.default.createReadStream(imagePath),
+        n: Math.min(n, 4),
+        size: size,
+        response_format: 'url',
+    });
+    return (response.data || []).map(img => ({
+        url: img.url || '',
+    }));
+}
+async function createEdit(options) {
+    const { imagePath, maskPath, prompt, n = 1, size = '1024x1024' } = options;
+    const response = await exports.openai.images.edit({
+        image: fs_1.default.createReadStream(imagePath),
+        mask: maskPath ? fs_1.default.createReadStream(maskPath) : undefined,
+        prompt,
+        n: Math.min(n, 4),
+        size: size,
+        response_format: 'url',
+    });
+    return (response.data || []).map(img => ({
+        url: img.url || '',
+        revised_prompt: prompt,
     }));
 }
 function getModelConfig(model, size, quality) {

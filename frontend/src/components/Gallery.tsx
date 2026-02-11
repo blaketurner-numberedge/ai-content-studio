@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Trash2, Download, ExternalLink, ImageIcon, Calendar, Sparkles, Filter, Search, X, Archive, CheckSquare, Square, Package } from 'lucide-react'
+import { Trash2, Download, ExternalLink, ImageIcon, Calendar, Sparkles, Filter, Search, X, Archive, CheckSquare, Square, Package, Wand2, Copy } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { apiFetch, getImageUrl } from '../lib/api'
 
@@ -24,6 +24,9 @@ export default function Gallery() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
   const [isSelecting, setIsSelecting] = useState(false)
   const [isExporting, setIsExporting] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
+  const [editPrompt, setEditPrompt] = useState('')
+  const [isProcessing, setIsProcessing] = useState(false)
 
   useEffect(() => {
     loadGallery()
@@ -145,6 +148,69 @@ export default function Gallery() {
       toast.success(`Deleted ${data.deleted} images`)
     } catch (err) {
       toast.error('Failed to delete images')
+    }
+  }
+
+  const createVariations = async (id: string) => {
+    try {
+      setIsProcessing(true)
+      const res = await apiFetch(`/api/images/${id}/variations`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ n: 2, size: '1024x1024' })
+      })
+      
+      if (!res.ok) {
+        const err = await res.json()
+        if (res.status === 402) {
+          toast.error(`Need ${err.required} credits. You have ${err.balance}.`)
+          return
+        }
+        throw new Error(err.error || 'Failed to create variations')
+      }
+      
+      const data = await res.json()
+      setItems([...data.variations, ...items])
+      toast.success(`Created ${data.variations.length} variations!`)
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to create variations')
+    } finally {
+      setIsProcessing(false)
+    }
+  }
+
+  const editImage = async (id: string) => {
+    if (!editPrompt.trim()) {
+      toast.error('Please describe what to change')
+      return
+    }
+    
+    try {
+      setIsProcessing(true)
+      const res = await apiFetch(`/api/images/${id}/edit`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ prompt: editPrompt, n: 1, size: '1024x1024' })
+      })
+      
+      if (!res.ok) {
+        const err = await res.json()
+        if (res.status === 402) {
+          toast.error(`Need ${err.required} credits. You have ${err.balance}.`)
+          return
+        }
+        throw new Error(err.error || 'Failed to edit image')
+      }
+      
+      const data = await res.json()
+      setItems([...data.edits, ...items])
+      setIsEditing(false)
+      setEditPrompt('')
+      toast.success('Image edited successfully!')
+    } catch (err: any) {
+      toast.error(err.message || 'Failed to edit image')
+    } finally {
+      setIsProcessing(false)
     }
   }
 
@@ -378,11 +444,27 @@ export default function Gallery() {
                     </div>
                   </div>
                   <div className="pt-4 border-t border-gray-200 space-y-2">
+                    <button
+                      onClick={() => createVariations(selectedItem.id)}
+                      disabled={isProcessing}
+                      className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-gradient-to-r from-purple-600 to-pink-600 text-white rounded-lg hover:from-purple-700 hover:to-pink-700 disabled:opacity-50 transition-colors"
+                    >
+                      <Copy className="w-4 h-4" />
+                      {isProcessing ? 'Working...' : 'Create Variations'}
+                    </button>
+                    <button
+                      onClick={() => setIsEditing(true)}
+                      disabled={isProcessing}
+                      className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-gradient-to-r from-blue-600 to-cyan-600 text-white rounded-lg hover:from-blue-700 hover:to-cyan-700 disabled:opacity-50 transition-colors"
+                    >
+                      <Wand2 className="w-4 h-4" />
+                      Edit Image
+                    </button>
                     <a
                       href={getImageUrl(selectedItem.url)}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
+                      className="flex items-center justify-center gap-2 w-full px-4 py-2 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
                     >
                       <ExternalLink className="w-4 h-4" />
                       View Full Size
@@ -404,6 +486,71 @@ export default function Gallery() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Dialog */}
+      {selectedItem && isEditing && (
+        <div className="fixed inset-0 bg-black/80 z-[60] flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl max-w-lg w-full p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="font-semibold text-gray-900 flex items-center gap-2">
+                <Wand2 className="w-5 h-5 text-blue-600" />
+                Edit Image
+              </h3>
+              <button
+                onClick={() => { setIsEditing(false); setEditPrompt('') }}
+                className="p-1 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <p className="text-sm text-gray-600 mb-4">
+              Describe what you want to change about this image. The AI will create a new version based on your instructions.
+            </p>
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-gray-700 mb-2">Edit Instructions</label>
+              <textarea
+                value={editPrompt}
+                onChange={(e) => setEditPrompt(e.target.value)}
+                placeholder="e.g., 'Change the background to a sunset' or 'Make it more colorful'"
+                className="w-full px-4 py-2 rounded-lg border border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 outline-none resize-none"
+                rows={4}
+                autoFocus
+              />
+            </div>
+            <div className="bg-blue-50 rounded-lg p-3 mb-4 flex items-start gap-2">
+              <Sparkles className="w-4 h-4 text-blue-600 mt-0.5 flex-shrink-0" />
+              <p className="text-xs text-blue-700">
+                Tip: Be specific about what to change. The original image will remain unchanged.
+              </p>
+            </div>
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setIsEditing(false); setEditPrompt('') }}
+                className="flex-1 px-4 py-2 border border-gray-200 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={() => editImage(selectedItem.id)}
+                disabled={isProcessing || !editPrompt.trim()}
+                className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
+              >
+                {isProcessing ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="w-4 h-4" />
+                    Apply Edit (1 credit)
+                  </>
+                )}
+              </button>
             </div>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import OpenAI from 'openai';
+import fs from 'fs';
 
 if (!process.env.OPENAI_API_KEY) {
   throw new Error('OPENAI_API_KEY environment variable is required');
@@ -25,6 +26,20 @@ export interface GeneratedImage {
   b64_json?: string;
 }
 
+export interface VariationOptions {
+  imagePath: string;
+  n?: number;
+  size?: string;
+}
+
+export interface EditOptions {
+  imagePath: string;
+  maskPath?: string;
+  prompt: string;
+  n?: number;
+  size?: string;
+}
+
 export async function generateImage(options: GenerateImageOptions): Promise<GeneratedImage[]> {
   const { prompt, model = 'dall-e-3', size, quality, style, n = 1 } = options;
 
@@ -44,6 +59,39 @@ export async function generateImage(options: GenerateImageOptions): Promise<Gene
   return (response.data || []).map(img => ({
     url: img.url || '',
     revised_prompt: img.revised_prompt,
+  }));
+}
+
+export async function createVariations(options: VariationOptions): Promise<GeneratedImage[]> {
+  const { imagePath, n = 1, size = '1024x1024' } = options;
+
+  const response = await openai.images.createVariation({
+    image: fs.createReadStream(imagePath),
+    n: Math.min(n, 4),
+    size: size as any,
+    response_format: 'url',
+  });
+
+  return (response.data || []).map(img => ({
+    url: img.url || '',
+  }));
+}
+
+export async function createEdit(options: EditOptions): Promise<GeneratedImage[]> {
+  const { imagePath, maskPath, prompt, n = 1, size = '1024x1024' } = options;
+
+  const response = await openai.images.edit({
+    image: fs.createReadStream(imagePath),
+    mask: maskPath ? fs.createReadStream(maskPath) : undefined,
+    prompt,
+    n: Math.min(n, 4),
+    size: size as any,
+    response_format: 'url',
+  });
+
+  return (response.data || []).map(img => ({
+    url: img.url || '',
+    revised_prompt: prompt,
   }));
 }
 

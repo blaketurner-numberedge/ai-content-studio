@@ -2,10 +2,12 @@ import { Router } from 'express';
 import { z } from 'zod';
 import { v4 as uuidv4 } from 'uuid';
 import fs from 'fs/promises';
+import fsSync from 'fs';
 import path from 'path';
-import { generateImage, ImageModel, MODEL_OPTIONS } from '../services/openai';
+import { generateImage, createVariations, createEdit, ImageModel, MODEL_OPTIONS } from '../services/openai';
 import { getUserCredits, useCredits, MODEL_CREDIT_COSTS } from './credits';
 import { trackEvent } from './analytics';
+import axios from 'axios';
 
 const router = Router();
 
@@ -217,6 +219,217 @@ router.post('/batch', async (req, res) => {
 // Get model options
 router.get('/models', (_req, res) => {
   res.json(MODEL_OPTIONS);
+});
+
+// Variation schema
+const variationSchema = z.object({
+  n: z.number().min(1).max(4).default(1),
+  size: z.enum(['256x256', '512x512', '1024x1024']).default('1024x1024'),
+});
+
+// Create variations of an existing image
+router.post('/:id/variations', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const input = variationSchema.parse(req.body);
+    const userId = getUserId(req);
+    
+    // Check credits (variations cost same as dalle-2)
+    const cost = (MODEL_CREDIT_COSTS['dall-e-2'] || 1) * input.n;
+    const credits = await getUserCredits(userId);
+    
+    if (credits.balance < cost) {
+      return res.status(402).json({ 
+        error: 'Insufficient credits',
+        required: cost,
+        balance: credits.balance,
+        upgradeUrl: '/credits'
+      });
+    }
+    
+    // Get the original image metadata
+    const uploadDir = path.join(__dirname, '../../uploads');
+    const metadataPath = path.join(uploadDir, `${id}.json`);
+    
+    if (!fsSync.existsSync(metadataPath)) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+    
+    const metadata = JSON.parse(await fs.readFile(metadataPath, 'utf-8'));
+    
+    // Download the original image
+    const imageResponse = await axios.get(metadata.url, { responseType: 'arraybuffer' });
+    const tempImagePath = path.join(uploadDir, `temp_${id}.png`);
+    await fs.writeFile(tempImagePath, Buffer.from(imageResponse.data));
+    
+    console.log(`🎨 Creating ${input.n} variation(s) of image ${id}`);
+    
+    try {
+      const variations = await createVariations({
+        imagePath: tempImagePath,
+        n: input.n,
+        size: input.size,
+      });
+      
+      // Save variation metadata
+      const savedVariations = await Promise.all(
+        variations.map(async (img) => {
+          const newId = uuidv4();
+          const newMetadata = {
+            id: newId,
+            url: img.url,
+            prompt: `Variation of: ${metadata.prompt}`,
+            originalId: id,
+            model: 'dall-e-2',
+            size: input.size,
+            createdAt: new Date().toISOString(),
+          };
+          
+          await fs.writeFile(
+            path.join(uploadDir, `${newId}.json`),
+            JSON.stringify(newMetadata, null, 2)
+          );
+          
+          return newMetadata;
+        })
+      );
+      
+      // Deduct credits
+      await useCredits(userId, cost);
+      await trackEvent('credits_used', userId, { credits: cost, reason: 'image_variation' });
+      await trackEvent('image_variation', userId, { 
+        originalId: id, 
+        count: input.n, 
+        cost 
+      });
+      
+      res.json({
+        success: true,
+        variations: savedVariations,
+        creditsUsed: cost,
+        remainingCredits: credits.balance - cost,
+      });
+    } finally {
+      // Cleanup temp file
+      if (fsSync.existsSync(tempImagePath)) {
+        await fs.unlink(tempImagePath).catch(() => {});
+      }
+    }
+  } catch (error) {
+    console.error('Variation error:', error);
+    if (error instanceof z.ZodError) {
+      res.status(400).json({ error: 'Invalid input', details: error.errors });
+    } else {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  }
+});
+
+// Edit schema
+const editSchema = z.object({
+  prompt: z.string().min(1).max(4000),
+  n: z.number().min(1).max(4).default(1),
+  size: z.enum(['256x256', '512x512', '1024x1024']).default('1024x1024'),
+});
+
+// Edit an existing image with a prompt
+router.post('/:id/edit', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const input = editSchema.parse(req.body);
+    const userId = getUserId(req);
+    
+    // Check credits (edits cost same as dalle-2)
+    const cost = (MODEL_CREDIT_COSTS['dall-e-2'] || 1) * input.n;
+    const credits = await getUserCredits(userId);
+    
+    if (credits.balance < cost) {
+      return res.status(402).json({ 
+        error: 'Insufficient credits',
+        required: cost,
+        balance: credits.balance,
+        upgradeUrl: '/credits'
+      });
+    }
+    
+    // Get the original image metadata
+    const uploadDir = path.join(__dirname, '../../uploads');
+    const metadataPath = path.join(uploadDir, `${id}.json`);
+    
+    if (!fsSync.existsSync(metadataPath)) {
+      return res.status(404).json({ error: 'Image not found' });
+    }
+    
+    const metadata = JSON.parse(await fs.readFile(metadataPath, 'utf-8'));
+    
+    // Download the original image
+    const imageResponse = await axios.get(metadata.url, { responseType: 'arraybuffer' });
+    const tempImagePath = path.join(uploadDir, `temp_${id}.png`);
+    await fs.writeFile(tempImagePath, Buffer.from(imageResponse.data));
+    
+    console.log(`✏️ Editing image ${id} with prompt: "${input.prompt.slice(0, 50)}..."`);
+    
+    try {
+      const edits = await createEdit({
+        imagePath: tempImagePath,
+        prompt: input.prompt,
+        n: input.n,
+        size: input.size,
+      });
+      
+      // Save edit metadata
+      const savedEdits = await Promise.all(
+        edits.map(async (img) => {
+          const newId = uuidv4();
+          const newMetadata = {
+            id: newId,
+            url: img.url,
+            prompt: input.prompt,
+            originalPrompt: metadata.prompt,
+            originalId: id,
+            model: 'dall-e-2',
+            size: input.size,
+            createdAt: new Date().toISOString(),
+          };
+          
+          await fs.writeFile(
+            path.join(uploadDir, `${newId}.json`),
+            JSON.stringify(newMetadata, null, 2)
+          );
+          
+          return newMetadata;
+        })
+      );
+      
+      // Deduct credits
+      await useCredits(userId, cost);
+      await trackEvent('credits_used', userId, { credits: cost, reason: 'image_edit' });
+      await trackEvent('image_edit', userId, { 
+        originalId: id, 
+        count: input.n, 
+        cost 
+      });
+      
+      res.json({
+        success: true,
+        edits: savedEdits,
+        creditsUsed: cost,
+        remainingCredits: credits.balance - cost,
+      });
+    } finally {
+      // Cleanup temp file
+      if (fsSync.existsSync(tempImagePath)) {
+        await fs.unlink(tempImagePath).catch(() => {});
+      }
+    }
+  } catch (error) {
+    console.error('Edit error:', error);
+    if (error instanceof z.ZodError) {
+      res.status(400).json({ error: 'Invalid input', details: error.errors });
+    } else {
+      res.status(500).json({ error: (error as Error).message });
+    }
+  }
 });
 
 export { router as imageRoutes };

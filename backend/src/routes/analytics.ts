@@ -15,7 +15,7 @@ interface AnalyticsData {
 
 interface AnalyticsEvent {
   id: string;
-  type: 'image_generated' | 'image_failed' | 'credits_purchased' | 'credits_used' | 'gallery_export' | 'prompt_used';
+  type: 'image_generated' | 'image_failed' | 'credits_purchased' | 'credits_used' | 'gallery_export' | 'prompt_used' | 'image_variation' | 'image_edit';
   userId: string;
   timestamp: string;
   metadata: Record<string, any>;
