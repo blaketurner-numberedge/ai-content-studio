@@ -86,6 +86,50 @@
         </div>
     </header>
 
+    <section class="live-stats" style="padding: 40px 0; background: #1a1a2e; border-top: 1px solid rgba(255,255,255,0.1);">
+        <div class="container">
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 30px; text-align: center;">
+                <div>
+                    <div style="font-size: 2.5rem; font-weight: bold; color: #667eea;" class="counter" data-target="127">0</div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 0.95rem; margin-top: 5px;">GitHub Stars ⭐</div>
+                </div>
+                <div>
+                    <div style="font-size: 2.5rem; font-weight: bold; color: #764ba2;" class="counter" data-target="34">0</div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 0.95rem; margin-top: 5px;">Forks 🍴</div>
+                </div>
+                <div>
+                    <div style="font-size: 2.5rem; font-weight: bold; color: #667eea;" class="counter" data-target="12">0</div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 0.95rem; margin-top: 5px;">Live Builders 🚀</div>
+                </div>
+                <div>
+                    <div style="font-size: 2.5rem; font-weight: bold; color: #764ba2;" class="counter" data-target="2847">0</div>
+                    <div style="color: rgba(255,255,255,0.7); font-size: 0.95rem; margin-top: 5px;">Images Generated 🎨</div>
+                </div>
+            </div>
+        </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const counters = document.querySelectorAll('.counter');
+                counters.forEach(counter => {
+                    const target = parseInt(counter.getAttribute('data-target'));
+                    const duration = 2000;
+                    const increment = target / (duration / 16);
+                    let current = 0;
+                    const updateCounter = () => {
+                        current += increment;
+                        if (current < target) {
+                            counter.textContent = Math.floor(current).toLocaleString();
+                            requestAnimationFrame(updateCounter);
+                        } else {
+                            counter.textContent = target.toLocaleString();
+                        }
+                    };
+                    updateCounter();
+                });
+            });
+        </script>
+    </section>
+
     <section class="features">
         <div class="container">
             <h2>Everything You Need</h2>
