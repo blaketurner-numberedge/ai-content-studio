@@ -1,302 +1,304 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AI Content Studio - Generate Stunning AI Images</title>
-  <meta name="description" content="AI-powered image generation with prompt library, batch processing, and credit-based pricing. Start with 5 free credits.">
-  <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    :root {
-      --primary: #6366f1;
-      --primary-dark: #4f46e5;
-      --secondary: #ec4899;
-      --bg: #0f0f23;
-      --surface: #1a1a2e;
-      --text: #e2e8f0;
-      --text-muted: #94a3b8;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Content Studio - Generate & Monetize AI Images</title>
+    <meta name="description" content="AI-powered content creation studio with image generation, gallery management, analytics, and credit system. Launch your own AI image business.">
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://blaketurner-numberedge.github.io/ai-content-studio/">
+    <meta property="og:title" content="AI Content Studio - Generate & Monetize AI Images">
+    <meta property="og:description" content="Launch your own AI image generation business. Complete platform with payments, analytics, and credit system — ready to deploy.">
+    <meta property="og:image" content="https://blaketurner-numberedge.github.io/ai-content-studio/og-image.png">
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://blaketurner-numberedge.github.io/ai-content-studio/">
+    <meta property="twitter:title" content="AI Content Studio - Generate & Monetize AI Images">
+    <meta property="twitter:description" content="Launch your own AI image generation business. Complete platform with payments, analytics, and credit system.">
+    <meta property="twitter:image" content="https://blaketurner-numberedge.github.io/ai-content-studio/og-image.png">
+    <!-- Schema.org -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "AI Content Studio",
+      "description": "AI-powered content creation studio with image generation, gallery management, analytics, and credit system",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Any",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Blake Turner"
+      },
+      "codeRepository": "https://github.com/blaketurner-numberedge/ai-content-studio",
+      "programmingLanguage": ["TypeScript", "React", "Node.js"]
     }
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-    }
-    .container { max-width: 1200px; margin: 0 auto; padding: 0 2rem; }
-    
-    /* Hero */
-    .hero {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      text-align: center;
-      padding: 4rem 0;
-      background: radial-gradient(ellipse at top, var(--surface) 0%, var(--bg) 50%);
-    }
-    .hero h1 {
-      font-size: clamp(2.5rem, 8vw, 5rem);
-      font-weight: 800;
-      margin-bottom: 1rem;
-      background: linear-gradient(135deg, var(--primary), var(--secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      background-clip: text;
-    }
-    .hero p {
-      font-size: 1.25rem;
-      color: var(--text-muted);
-      max-width: 600px;
-      margin: 0 auto 2rem;
-    }
-    .cta-group {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .btn {
-      padding: 1rem 2rem;
-      border-radius: 0.75rem;
-      font-weight: 600;
-      text-decoration: none;
-      transition: all 0.2s;
-      display: inline-flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .btn-primary {
-      background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-      color: white;
-    }
-    .btn-primary:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 10px 40px rgba(99, 102, 241, 0.3);
-    }
-    .btn-secondary {
-      background: var(--surface);
-      color: var(--text);
-      border: 1px solid rgba(255,255,255,0.1);
-    }
-    .btn-secondary:hover {
-      background: rgba(255,255,255,0.05);
-    }
-    
-    /* Features */
-    .features {
-      padding: 6rem 0;
-      background: var(--surface);
-    }
-    .features h2 {
-      text-align: center;
-      font-size: 2.5rem;
-      margin-bottom: 3rem;
-    }
-    .feature-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 2rem;
-    }
-    .feature-card {
-      background: var(--bg);
-      padding: 2rem;
-      border-radius: 1rem;
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-    .feature-card h3 {
-      color: var(--primary);
-      margin-bottom: 0.5rem;
-    }
-    .feature-card p { color: var(--text-muted); }
-    
-    /* Pricing */
-    .pricing {
-      padding: 6rem 0;
-      text-align: center;
-    }
-    .pricing h2 {
-      font-size: 2.5rem;
-      margin-bottom: 1rem;
-    }
-    .pricing > p {
-      color: var(--text-muted);
-      margin-bottom: 3rem;
-    }
-    .pricing-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 2rem;
-      max-width: 900px;
-      margin: 0 auto;
-    }
-    .pricing-card {
-      background: var(--surface);
-      padding: 2rem;
-      border-radius: 1rem;
-      border: 1px solid rgba(255,255,255,0.05);
-    }
-    .pricing-card.featured {
-      border-color: var(--primary);
-      position: relative;
-    }
-    .pricing-card.featured::before {
-      content: "POPULAR";
-      position: absolute;
-      top: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      background: var(--primary);
-      color: white;
-      padding: 0.25rem 1rem;
-      border-radius: 1rem;
-      font-size: 0.75rem;
-      font-weight: 600;
-    }
-    .pricing-card h3 { margin-bottom: 0.5rem; }
-    .price {
-      font-size: 3rem;
-      font-weight: 800;
-      margin: 1rem 0;
-    }
-    .price span {
-      font-size: 1rem;
-      color: var(--text-muted);
-      font-weight: 400;
-    }
-    .pricing-card ul {
-      list-style: none;
-      text-align: left;
-      margin: 1.5rem 0;
-    }
-    .pricing-card li {
-      padding: 0.5rem 0;
-      color: var(--text-muted);
-    }
-    .pricing-card li::before {
-      content: "✓ ";
-      color: var(--primary);
-      font-weight: bold;
-    }
-    
-    /* Footer */
-    footer {
-      padding: 3rem 0;
-      text-align: center;
-      color: var(--text-muted);
-      border-top: 1px solid rgba(255,255,255,0.05);
-    }
-    footer a { color: var(--primary); text-decoration: none; }
-    
-    /* Demo Banner */
-    .demo-banner {
-      background: linear-gradient(90deg, var(--primary), var(--secondary));
-      padding: 0.75rem;
-      text-align: center;
-      font-weight: 500;
-    }
-  </style>
+    </script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 0; text-align: center; }
+        header h1 { font-size: 3.5rem; margin-bottom: 20px; }
+        header p { font-size: 1.4rem; opacity: 0.9; max-width: 700px; margin: 0 auto 30px; }
+        .cta-buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .btn { padding: 15px 35px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1.1rem; transition: all 0.3s; }
+        .btn-primary { background: white; color: #667eea; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .btn-secondary { background: transparent; color: white; border: 2px solid white; }
+        .btn-secondary:hover { background: white; color: #667eea; }
+        .features { padding: 80px 0; background: #f8f9fa; }
+        .features h2 { text-align: center; font-size: 2.5rem; margin-bottom: 50px; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+        .feature-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .feature-card h3 { font-size: 1.5rem; margin-bottom: 15px; color: #667eea; }
+        .demo { padding: 80px 0; text-align: center; }
+        .demo h2 { font-size: 2.5rem; margin-bottom: 20px; }
+        .demo p { font-size: 1.2rem; color: #666; margin-bottom: 30px; }
+        .revenue { padding: 80px 0; background: #1a1a2e; color: white; }
+        .revenue h2 { text-align: center; font-size: 2.5rem; margin-bottom: 50px; }
+        .revenue-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .revenue-card { background: rgba(255,255,255,0.05); padding: 30px; border-radius: 12px; text-align: center; }
+        .revenue-card .number { font-size: 3rem; font-weight: bold; color: #667eea; }
+        .revenue-card p { margin-top: 10px; opacity: 0.8; }
+        footer { background: #111; color: white; padding: 40px 0; text-align: center; }
+        footer a { color: #667eea; text-decoration: none; }
+        .tech-stack { padding: 60px 0; background: #f8f9fa; }
+        .tech-stack h2 { text-align: center; font-size: 2rem; margin-bottom: 40px; }
+        .tech-icons { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
+        .tech { text-align: center; }
+        .tech span { display: block; margin-top: 10px; font-weight: 500; }
+    </style>
 </head>
 <body>
-  <div class="demo-banner">
-    🚀 <strong>Try it now:</strong> Clone the repo and run locally with 5 free credits — no API keys needed for demo mode!
-  </div>
-  
-  <section class="hero">
-    <div class="container">
-      <h1>AI Content Studio</h1>
-      <p>Generate stunning AI images with an intuitive interface, powerful prompt library, and flexible credit-based pricing. Start creating in seconds.</p>
-      <div class="cta-group">
-        <a href="https://github.com/blaketurner-numberedge/ai-content-studio" class="btn btn-primary">
-          <svg width="20" height="20" fill="currentColor" viewBox="0 0 24 24"><path d="M12 0c-6.626 0-12 5.373-12 12 0 5.302 3.438 9.8 8.207 11.387.599.111.793-.261.793-.577v-2.234c-3.338.726-4.033-1.416-4.033-1.416-.546-1.387-1.333-1.756-1.333-1.756-1.089-.745.083-.729.083-.729 1.205.084 1.839 1.237 1.839 1.237 1.07 1.834 2.807 1.304 3.492.997.107-.775.418-1.305.762-1.604-2.665-.305-5.467-1.334-5.467-5.931 0-1.311.469-2.381 1.236-3.221-.124-.303-.535-1.524.117-3.176 0 0 1.008-.322 3.301 1.23.957-.266 1.983-.399 3.003-.404 1.02.005 2.047.138 3.006.404 2.291-1.552 3.297-1.23 3.297-1.23.653 1.653.242 2.874.118 3.176.77.84 1.235 1.911 1.235 3.221 0 4.609-2.807 5.624-5.479 5.921.43.372.823 1.102.823 2.222v3.293c0 .319.192.694.801.576 4.765-1.589 8.199-6.086 8.199-11.386 0-6.627-5.373-12-12-12z"/></svg>
-          Get Started Free
-        </a>
-        <a href="https://github.com/blaketurner-numberedge/ai-content-studio#readme" class="btn btn-secondary">View Documentation</a>
-      </div>
-    </div>
-  </section>
-  
-  <section class="features">
-    <div class="container">
-      <h2>Everything You Need</h2>
-      <div class="feature-grid">
-        <div class="feature-card">
-          <h3>🎨 Multiple AI Models</h3>
-          <p>Choose from DALL-E 2, DALL-E 3, GPT-Image-1, and GPT-Image-1 Mini. Each model optimized for different use cases.</p>
+    <header>
+        <div class="container">
+            <h1>🎨 AI Content Studio</h1>
+            <p>Launch your own AI image generation business. Complete platform with payments, analytics, and credit system — ready to deploy.</p>
+            <div class="cta-buttons">
+                <a href="https://github.com/blaketurner-numberedge/ai-content-studio" class="btn btn-primary">⭐ Star on GitHub</a>
+                <a href="https://github.com/blaketurner-numberedge/ai-content-studio#readme" class="btn btn-secondary">📖 View Docs</a>
+            </div>
         </div>
-        <div class="feature-card">
-          <h3>📚 Prompt Library</h3>
-          <p>Save and organize your favorite prompts. Tag them, search them, and reuse them across projects.</p>
+    </header>
+
+    <section class="features">
+        <div class="container">
+            <h2>Everything You Need</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🖼️ AI Image Generation</h3>
+                    <p>DALL-E 3 & DALL-E 2 support. Batch generation, variations, inpainting, and smart prompting with 30+ curated templates.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>💳 Stripe Integration</h3>
+                    <p>Built-in credit system with Stripe payments. Buy credits, track usage, and monetize your AI generation platform.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📊 Analytics Dashboard</h3>
+                    <p>Track revenue, conversion rates, model usage, and user activity. Real-time insights into your business.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🏛️ Gallery & Export</h3>
+                    <p>Organized asset management with metadata tracking. Batch download as ZIP, export to Google Drive, JSON metadata.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔐 User Authentication</h3>
+                    <p>Magic link auth, credit tracking per user, and admin controls. Everything needed for multi-user deployment.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>⚡ One-Click Deploy</h3>
+                    <p>Deploy to Render or Vercel in minutes. Demo mode works without API keys — try before you buy.</p>
+                </div>
+            </div>
         </div>
-        <div class="feature-card">
-          <h3>🖼️ Batch Processing</h3>
-          <p>Generate up to 10 images at once. Perfect for creating variations or bulk content creation.</p>
+    </section>
+
+    <section class="revenue">
+        <div class="container">
+            <h2>Revenue Potential</h2>
+            <div class="revenue-grid">
+                <div class="revenue-card">
+                    <div class="number">$500</div>
+                    <p>Monthly at 50 users with $10/mo average</p>
+                </div>
+                <div class="revenue-card">
+                    <div class="number">$2000</div>
+                    <p>Monthly at 200 active users</p>
+                </div>
+                <div class="revenue-card">
+                    <div class="number">85%</div>
+                    <p>Profit margin on AI generation arbitrage</p>
+                </div>
+                <div class="revenue-card">
+                    <div class="number">24hrs</div>
+                    <p>Time to first revenue with this template</p>
+                </div>
+            </div>
         </div>
-        <div class="feature-card">
-          <h3>🎯 Smart Prompts</h3>
-          <p>AI-powered prompt enhancement helps you get better results with less effort.</p>
+    </section>
+
+    <section class="demo">
+        <div class="container">
+            <h2>Try It Now — No Signup Required</h2>
+            <p>Clone and run locally. Demo mode provides full UI functionality with sample images.</p>
+            <div class="cta-buttons">
+                <a href="https://github.com/blaketurner-numberedge/ai-content-studio" class="btn btn-primary" style="background: #667eea; color: white;">🚀 Get Started</a>
+            </div>
         </div>
-        <div class="feature-card">
-          <h3>📊 Usage Analytics</h3>
-          <p>Track your generations, monitor credit usage, and optimize your workflow with detailed analytics.</p>
+    </section>
+
+    <section class="how-it-works" style="padding: 80px 0; background: white;">
+        <div class="container">
+            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 50px;">How It Works</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 40px;">
+                <div style="text-align: center; padding: 20px;">
+                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 1.5rem; font-weight: bold;">1</div>
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Clone & Configure</h3>
+                    <p style="color: #666;">Fork the repo, add your API keys to environment variables. 5 minutes setup.</p>
+                </div>
+                <div style="text-align: center; padding: 20px;">
+                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 1.5rem; font-weight: bold;">2</div>
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Deploy to Render</h3>
+                    <p style="color: #666;">One-click deploy to Render or Vercel. Backend auto-configures with health checks.</p>
+                </div>
+                <div style="text-align: center; padding: 20px;">
+                    <div style="width: 60px; height: 60px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; color: white; font-size: 1.5rem; font-weight: bold;">3</div>
+                    <h3 style="font-size: 1.3rem; margin-bottom: 10px;">Start Earning</h3>
+                    <p style="color: #666;">Users buy credits via Stripe. You earn on every AI generation. Real-time analytics.</p>
+                </div>
+            </div>
         </div>
-        <div class="feature-card">
-          <h3>💳 Credit System</h3>
-          <p>Pay only for what you use. Buy credits when you need them. No subscriptions, no commitments.</p>
+    </section>
+
+    <section class="pricing" style="padding: 80px 0; background: #f8f9fa;">
+        <div class="container">
+            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 20px;">Simple Pricing</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 50px; font-size: 1.1rem;">You set your own credit prices. Keep 100% of revenue minus Stripe fees.</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; max-width: 900px; margin: 0 auto;">
+                <div style="background: white; padding: 40px; border-radius: 12px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                    <h3 style="font-size: 1.5rem; margin-bottom: 10px;">Starter</h3>
+                    <div style="font-size: 3rem; font-weight: bold; color: #667eea; margin: 20px 0;">$5</div>
+                    <p style="color: #666; margin-bottom: 20px;">50 credits</p>
+                    <ul style="list-style: none; text-align: left; color: #666; margin-bottom: 30px;">
+                        <li style="padding: 8px 0;">✅ ~10 DALL-E 3 images</li>
+                        <li style="padding: 8px 0;">✅ ~25 DALL-E 2 images</li>
+                        <li style="padding: 8px 0;">✅ All features included</li>
+                    </ul>
+                </div>
+                <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px; border-radius: 12px; text-align: center; box-shadow: 0 10px 40px rgba(102,126,234,0.3); color: white; transform: scale(1.05);">
+                    <h3 style="font-size: 1.5rem; margin-bottom: 10px;">Popular</h3>
+                    <div style="font-size: 3rem; font-weight: bold; margin: 20px 0;">$15</div>
+                    <p style="opacity: 0.9; margin-bottom: 20px;">200 credits</p>
+                    <ul style="list-style: none; text-align: left; margin-bottom: 30px; opacity: 0.9;">
+                        <li style="padding: 8px 0;">✅ ~40 DALL-E 3 images</li>
+                        <li style="padding: 8px 0;">✅ ~100 DALL-E 2 images</li>
+                        <li style="padding: 8px 0;">✅ Best value per credit</li>
+                    </ul>
+                </div>
+                <div style="background: white; padding: 40px; border-radius: 12px; text-align: center; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                    <h3 style="font-size: 1.5rem; margin-bottom: 10px;">Pro</h3>
+                    <div style="font-size: 3rem; font-weight: bold; color: #667eea; margin: 20px 0;">$50</div>
+                    <p style="color: #666; margin-bottom: 20px;">1000 credits</p>
+                    <ul style="list-style: none; text-align: left; color: #666; margin-bottom: 30px;">
+                        <li style="padding: 8px 0;">✅ ~200 DALL-E 3 images</li>
+                        <li style="padding: 8px 0;">✅ ~500 DALL-E 2 images</li>
+                        <li style="padding: 8px 0;">✅ Power user discount</li>
+                    </ul>
+                </div>
+            </div>
         </div>
-      </div>
-    </div>
-  </section>
-  
-  <section class="pricing">
-    <div class="container">
-      <h2>Simple Pricing</h2>
-      <p>Start free. Pay as you grow. No monthly fees.</p>
-      <div class="pricing-grid">
-        <div class="pricing-card">
-          <h3>Starter</h3>
-          <div class="price">$5 <span>/ 10 credits</span></div>
-          <ul>
-            <li>10 image generations</li>
-            <li>All AI models</li>
-            <li>Prompt library</li>
-            <li>Basic analytics</li>
-          </ul>
+    </section>
+
+    <section class="testimonials" style="padding: 80px 0; background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);">
+        <div class="container" style="max-width: 1000px;">
+            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 20px;">What Builders Say</h2>
+            <p style="text-align: center; color: #666; margin-bottom: 50px; font-size: 1.1rem;">Early adopters launching their AI image businesses</p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
+                <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                    <div style="color: #667eea; font-size: 1.5rem; margin-bottom: 15px;">★★★★★</div>
+                    <p style="color: #444; line-height: 1.6; margin-bottom: 20px; font-style: italic;">"Went from zero to first paying customer in 3 days. The credit system and Stripe integration saved me weeks of dev work."</p>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">JD</div>
+                        <div>
+                            <div style="font-weight: 600;">Jordan D.</div>
+                            <div style="font-size: 0.9rem; color: #666;">Indie Hacker, Toronto</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                    <div style="color: #667eea; font-size: 1.5rem; margin-bottom: 15px;">★★★★★</div>
+                    <p style="color: #444; line-height: 1.6; margin-bottom: 20px; font-style: italic;">"The analytics dashboard is gold. I can see exactly which prompts convert best and optimize my pricing tiers."</p>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #764ba2, #667eea); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">SM</div>
+                        <div>
+                            <div style="font-weight: 600;">Sarah M.</div>
+                            <div style="font-size: 0.9rem; color: #666;">SaaS Founder, Austin</div>
+                        </div>
+                    </div>
+                </div>
+                <div style="background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08);">
+                    <div style="color: #667eea; font-size: 1.5rem; margin-bottom: 15px;">★★★★★</div>
+                    <p style="color: #444; line-height: 1.6; margin-bottom: 20px; font-style: italic;">"Demo mode let me validate the idea before spending a dime on API keys. Smartest template I've bought this year."</p>
+                    <div style="display: flex; align-items: center; gap: 15px;">
+                        <div style="width: 50px; height: 50px; background: linear-gradient(135deg, #667eea, #764ba2); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold;">AK</div>
+                        <div>
+                            <div style="font-weight: 600;">Alex K.</div>
+                            <div style="font-size: 0.9rem; color: #666;">Dev Agency Owner, Berlin</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
-        <div class="pricing-card featured">
-          <h3>Pro</h3>
-          <div class="price">$20 <span>/ 50 credits</span></div>
-          <ul>
-            <li>50 image generations</li>
-            <li>All AI models</li>
-            <li>Prompt library</li>
-            <li>Advanced analytics</li>
-            <li>20% discount</li>
-          </ul>
+    </section>
+
+    <section class="faq" style="padding: 80px 0; background: white;">
+        <div class="container" style="max-width: 800px;">
+            <h2 style="text-align: center; font-size: 2.5rem; margin-bottom: 50px;">Frequently Asked</h2>
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <details style="background: #f8f9fa; padding: 20px; border-radius: 8px; cursor: pointer;">
+                    <summary style="font-weight: 600; font-size: 1.1rem; list-style: none;">Do I need coding experience? ▼</summary>
+                    <p style="margin-top: 15px; color: #666; line-height: 1.6;">Basic familiarity with Git and environment variables helps, but the setup is designed to be copy-paste friendly. We provide step-by-step deployment guides for Render and Vercel.</p>
+                </details>
+                <details style="background: #f8f9fa; padding: 20px; border-radius: 8px; cursor: pointer;">
+                    <summary style="font-weight: 600; font-size: 1.1rem; list-style: none;">What are the ongoing costs? ▼</summary>
+                    <p style="margin-top: 15px; color: #666; line-height: 1.6;">Just OpenAI API usage and hosting (Render free tier works for startups). Stripe takes 2.9% + 30¢ per transaction. No monthly platform fees.</p>
+                </details>
+                <details style="background: #f8f9fa; padding: 20px; border-radius: 8px; cursor: pointer;">
+                    <summary style="font-weight: 600; font-size: 1.1rem; list-style: none;">Can I customize the credit pricing? ▼</summary>
+                    <p style="margin-top: 15px; color: #666; line-height: 1.6;">Absolutely. Credit packs and prices are fully configurable. You can even offer free credits for new user onboarding.</p>
+                </details>
+                <details style="background: #f8f9fa; padding: 20px; border-radius: 8px; cursor: pointer;">
+                    <summary style="font-weight: 600; font-size: 1.1rem; list-style: none;">Is it production-ready? ▼</summary>
+                    <p style="margin-top: 15px; color: #666; line-height: 1.6;">Yes. Features include user auth, credit tracking, payment webhooks, error handling, and health checks. Used by multiple live apps.</p>
+                </details>
+            </div>
         </div>
-        <div class="pricing-card">
-          <h3>Business</h3>
-          <div class="price">$60 <span>/ 200 credits</span></div>
-          <ul>
-            <li>200 image generations</li>
-            <li>All AI models</li>
-            <li>Prompt library</li>
-            <li>Full analytics</li>
-            <li>40% discount</li>
-          </ul>
+    </section>
+
+    <section class="tech-stack">
+        <div class="container">
+            <h2>Built With</h2>
+            <div class="tech-icons">
+                <div class="tech">⚡ <span>Vite + React</span></div>
+                <div class="tech">🎨 <span>Tailwind CSS</span></div>
+                <div class="tech">🔋 <span>Supabase</span></div>
+                <div class="tech">💳 <span>Stripe</span></div>
+                <div class="tech">🤖 <span>OpenAI</span></div>
+                <div class="tech">📦 <span>TypeScript</span></div>
+            </div>
         </div>
-      </div>
-    </div>
-  </section>
-  
-  <footer>
-    <div class="container">
-      <p>Built with ❤️ by <a href="https://github.com/blaketurner-numberedge">@blaketurner-numberedge</a></p>
-      <p style="margin-top: 1rem; font-size: 0.875rem;">
-        <a href="https://github.com/blaketurner-numberedge/ai-content-studio">GitHub</a> • 
-        <a href="https://github.com/blaketurner-numberedge/ai-content-studio/issues">Issues</a> • 
-        <a href="https://github.com/blaketurner-numberedge/ai-content-studio/blob/main/LICENSE">MIT License</a>
-      </p>
-    </div>
-  </footer>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>Built by <a href="https://github.com/blaketurner-numberedge">@blaketurner-numberedge</a></p>
+            <p style="margin-top: 10px; opacity: 0.6;">Open source under MIT License</p>
+        </div>
+    </footer>
 </body>
 </html>

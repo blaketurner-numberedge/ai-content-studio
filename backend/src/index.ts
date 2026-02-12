@@ -28,7 +28,13 @@ app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
 // Health check
 app.get('/health', (_req, res) => {
-  res.json({ status: 'ok', timestamp: new Date().toISOString() });
+  const { DEMO_MODE } = require('./services/openai');
+  res.json({ 
+    status: 'ok', 
+    timestamp: new Date().toISOString(),
+    demoMode: DEMO_MODE,
+    message: DEMO_MODE ? 'Running in demo mode - add OPENAI_API_KEY for real generations' : undefined
+  });
 });
 
 // API routes
