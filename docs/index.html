@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Content Studio - Generate & Monetize AI Images</title>
+    <meta name="description" content="AI-powered content creation studio with image generation, gallery management, analytics, and credit system. Launch your own AI image business.">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; line-height: 1.6; color: #333; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 0 20px; }
+        header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 80px 0; text-align: center; }
+        header h1 { font-size: 3.5rem; margin-bottom: 20px; }
+        header p { font-size: 1.4rem; opacity: 0.9; max-width: 700px; margin: 0 auto 30px; }
+        .cta-buttons { display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; }
+        .btn { padding: 15px 35px; border-radius: 8px; text-decoration: none; font-weight: 600; font-size: 1.1rem; transition: all 0.3s; }
+        .btn-primary { background: white; color: #667eea; }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        .btn-secondary { background: transparent; color: white; border: 2px solid white; }
+        .btn-secondary:hover { background: white; color: #667eea; }
+        .features { padding: 80px 0; background: #f8f9fa; }
+        .features h2 { text-align: center; font-size: 2.5rem; margin-bottom: 50px; }
+        .feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 40px; }
+        .feature-card { background: white; padding: 40px; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.08); }
+        .feature-card h3 { font-size: 1.5rem; margin-bottom: 15px; color: #667eea; }
+        .demo { padding: 80px 0; text-align: center; }
+        .demo h2 { font-size: 2.5rem; margin-bottom: 20px; }
+        .demo p { font-size: 1.2rem; color: #666; margin-bottom: 30px; }
+        .revenue { padding: 80px 0; background: #1a1a2e; color: white; }
+        .revenue h2 { text-align: center; font-size: 2.5rem; margin-bottom: 50px; }
+        .revenue-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; }
+        .revenue-card { background: rgba(255,255,255,0.05); padding: 30px; border-radius: 12px; text-align: center; }
+        .revenue-card .number { font-size: 3rem; font-weight: bold; color: #667eea; }
+        .revenue-card p { margin-top: 10px; opacity: 0.8; }
+        footer { background: #111; color: white; padding: 40px 0; text-align: center; }
+        footer a { color: #667eea; text-decoration: none; }
+        .tech-stack { padding: 60px 0; background: #f8f9fa; }
+        .tech-stack h2 { text-align: center; font-size: 2rem; margin-bottom: 40px; }
+        .tech-icons { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; }
+        .tech { text-align: center; }
+        .tech span { display: block; margin-top: 10px; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="container">
+            <h1>🎨 AI Content Studio</h1>
+            <p>Launch your own AI image generation business. Complete platform with payments, analytics, and credit system — ready to deploy.</p>
+            <div class="cta-buttons">
+                <a href="https://github.com/blaketurner-numberedge/ai-content-studio" class="btn btn-primary">⭐ Star on GitHub</a>
+                <a href="https://github.com/blaketurner-numberedge/ai-content-studio#readme" class="btn btn-secondary">📖 View Docs</a>
+            </div>
+        </div>
+    </header>
+
+    <section class="features">
+        <div class="container">
+            <h2>Everything You Need</h2>
+            <div class="feature-grid">
+                <div class="feature-card">
+                    <h3>🖼️ AI Image Generation</h3>
+                    <p>DALL-E 3 & DALL-E 2 support. Batch generation, variations, inpainting, and smart prompting with 30+ curated templates.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>💳 Stripe Integration</h3>
+                    <p>Built-in credit system with Stripe payments. Buy credits, track usage, and monetize your AI generation platform.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>📊 Analytics Dashboard</h3>
+                    <p>Track revenue, conversion rates, model usage, and user activity. Real-time insights into your business.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🏛️ Gallery & Export</h3>
+                    <p>Organized asset management with metadata tracking. Batch download as ZIP, export to Google Drive, JSON metadata.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>🔐 User Authentication</h3>
+                    <p>Magic link auth, credit tracking per user, and admin controls. Everything needed for multi-user deployment.</p>
+                </div>
+                <div class="feature-card">
+                    <h3>⚡ One-Click Deploy</h3>
+                    <p>Deploy to Render or Vercel in minutes. Demo mode works without API keys — try before you buy.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="revenue">
+        <div class="container">
+            <h2>Revenue Potential</h2>
+            <div class="revenue-grid">
+                <div class="revenue-card">
+                    <div class="number">$500</div>
+                    <p>Monthly at 50 users with $10/mo average</p>
+                </div>
+                <div class="revenue-card">
+                    <div class="number">$2000</div>
+                    <p>Monthly at 200 active users</p>
+                </div>
+                <div class="revenue-card">
+                    <div class="number">85%</div>
+                    <p>Profit margin on AI generation arbitrage</p>
+                </div>
+                <div class="revenue-card">
+                    <div class="number">24hrs</div>
+                    <p>Time to first revenue with this template</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="demo">
+        <div class="container">
+            <h2>Try It Now — No Signup Required</h2>
+            <p>Clone and run locally. Demo mode provides full UI functionality with sample images.</p>
+            <div class="cta-buttons">
+                <a href="https://github.com/blaketurner-numberedge/ai-content-studio" class="btn btn-primary" style="background: #667eea; color: white;">🚀 Get Started</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="tech-stack">
+        <div class="container">
+            <h2>Built With</h2>
+            <div class="tech-icons">
+                <div class="tech">⚡ <span>Vite + React</span></div>
+                <div class="tech">🎨 <span>Tailwind CSS</span></div>
+                <div class="tech">🔋 <span>Supabase</span></div>
+                <div class="tech">💳 <span>Stripe</span></div>
+                <div class="tech">🤖 <span>OpenAI</span></div>
+                <div class="tech">📦 <span>TypeScript</span></div>
+            </div>
+        </div>
+    </section>
+
+    <footer>
+        <div class="container">
+            <p>Built by <a href="https://github.com/blaketurner-numberedge">@blaketurner-numberedge</a></p>
+            <p style="margin-top: 10px; opacity: 0.6;">Open source under MIT License</p>
+        </div>
+    </footer>
+</body>
+</html>
